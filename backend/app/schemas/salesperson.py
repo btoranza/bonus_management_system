@@ -1,15 +1,19 @@
 from datetime import date
-from decimal import Decimal
+from enum import Enum
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 
+
+class Team(str, Enum):
+    ENTERPRISE = "Enterprise"
+    SMB = "SMB"
+    MID_MARKET = "Mid-Market"
 
 class Salesperson(BaseModel):
     salesperson_id: str
     first_name: str
     last_name: str
     email: EmailStr
-    team: str
+    team: Team
     hire_date: date
-    commission_rate: Decimal = Field(examples=[0.05])
     active: bool
