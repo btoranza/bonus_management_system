@@ -1,73 +1,33 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import AverageSaleCard from '@/components/dashboard/AverageSaleCard'
+import GoalAchieversCard from '@/components/dashboard/GoalAchieversCard'
+import KpiCards from '@/components/dashboard/KpiCards'
+import NewCustomersCard from '@/components/dashboard/NewCustomersCard'
+import SalesByTeamCard from '@/components/dashboard/SalesByTeamCard'
+import SalesTrendCard from '@/components/dashboard/SalesTrendCard'
+import TopSalespeopleCard from '@/components/dashboard/TopSalesPeopleCard'
+import TotalBonusByTeamCard from '@/components/dashboard/TotalBonusByTeamCard'
+import GoalAchievementCard from '@/components/dashboard/GoalAchievementCard'
 
 const Dashboard = () => {
   return (
-    <div className="space-y-6 p-6">
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Sales
-            </CardTitle>
-          </CardHeader>
+    <div className="space-y-5 p-5">
+      <KpiCards />
 
-          <CardContent>
-            <p className="text-4xl font-bold tracking-tight">€ 425,000</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Bonus</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Sales</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Salespeople</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
+      <section className="grid gap-5 lg:grid-cols-3">
+        <SalesTrendCard />
+        <SalesByTeamCard />
+        <GoalAchievementCard />
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Sales Trend</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
+      <section className="grid gap-5 lg:grid-cols-3">
+        <TopSalespeopleCard />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Sales by Team</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Salesperson</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Goal Achievement</CardTitle>
-          </CardHeader>
-          <CardContent />
-        </Card>
+        <div className="grid gap-5 sm:grid-cols-2 lg:col-span-2">
+          <AverageSaleCard />
+          <NewCustomersCard />
+          <GoalAchieversCard />
+          <TotalBonusByTeamCard />
+        </div>
       </section>
     </div>
   )
