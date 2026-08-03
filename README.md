@@ -112,8 +112,6 @@ To keep payouts balanced, new customer bonuses are capped so they cannot outweig
 
 ## Tech Stack
 
-## Tech Stack
-
 | Frontend | Backend | Tooling |
 |----------|----------|----------|
 | ⚛️ React | ⚡ FastAPI | 🧹 Ruff |
