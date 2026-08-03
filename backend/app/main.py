@@ -30,8 +30,9 @@ app = FastAPI(lifespan=lifespan)
 # Allows the Vite dev server to call this API during local development.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_methods=["GET"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
