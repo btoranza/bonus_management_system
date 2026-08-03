@@ -89,8 +89,10 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 
 The application simulates a sales organization composed of three independent sales teams.
 
-| Team | Monthly Goal |
-|-------|-------------:|
+Monthly sales goals are assigned individually to each salesperson. Team performance is calculated by aggregating individual sales against the combined goals of all active team members.
+
+| Team | Monthly Goal (per Salesperson) |
+|-------|-------------------------------:|
 | Enterprise | $100,000 |
 | Mid-Market | $50,000 |
 | SMB | $20,000 |
