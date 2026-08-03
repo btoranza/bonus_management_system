@@ -10,7 +10,7 @@ const AverageSaleCard = ({ averageSaleByTeam }: AverageSaleCardProps) => {
   return (
     <Card className="lg:h-full">
       <CardHeader>
-        <CardTitle>Average Sale by Team</CardTitle>
+        <CardTitle>Average Sale</CardTitle>
       </CardHeader>
 
       <CardContent className="grid grid-cols-3 gap-4">

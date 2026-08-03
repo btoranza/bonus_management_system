@@ -33,15 +33,7 @@ const Salespeople = () => {
     order,
   })
 
-  if (isPending && !data) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <Spinner />
-      </div>
-    )
-  }
-
-  if (isError || !data) {
+  if (isError) {
     return <p>Failed to load salespeople.</p>
   }
 
@@ -58,21 +50,27 @@ const Salespeople = () => {
           filterOptions={TEAM_OPTIONS}
         />
 
-        <DataTable
-          columns={getSalespeopleTableColumns({
-            sort,
-            order,
-            onSortChange: (newSort, newOrder) => {
-              setSort(newSort)
-              setOrder(newOrder)
-              setPage(1)
-            },
-          })}
-          data={data.items}
-          page={page}
-          totalPages={data.total_pages}
-          onPageChange={setPage}
-        />
+        {isPending && !data ? (
+          <div className="flex h-[500px] items-center justify-center">
+            <Spinner />
+          </div>
+        ) : (
+          <DataTable
+            columns={getSalespeopleTableColumns({
+              sort,
+              order,
+              onSortChange: (newSort, newOrder) => {
+                setSort(newSort)
+                setOrder(newOrder)
+                setPage(1)
+              },
+            })}
+            data={data?.items ?? []}
+            page={page}
+            totalPages={data?.total_pages ?? 1}
+            onPageChange={setPage}
+          />
+        )}
       </div>
     </div>
   )

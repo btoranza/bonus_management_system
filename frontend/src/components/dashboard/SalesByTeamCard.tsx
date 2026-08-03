@@ -13,7 +13,7 @@ const SalesByTeamCard = ({ salesByTeam }: SalesByTeamCardProps) => {
   return (
     <Card className="h-96">
       <CardHeader>
-        <CardTitle>Sales by Team</CardTitle>
+        <CardTitle>Sales</CardTitle>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col">

@@ -11,7 +11,7 @@ const TotalBonusByTeamCard = ({ bonusByTeam }: TotalBonusByTeamCardProps) => {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Total Bonus by Team</CardTitle>
+        <CardTitle>Total Bonus</CardTitle>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col justify-evenly">

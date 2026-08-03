@@ -11,7 +11,7 @@ const NewCustomersCard = ({ newCustomersByTeam }: NewCustomersCardProps) => {
   return (
     <Card className="lg:h-full">
       <CardHeader>
-        <CardTitle>New Customers by Team</CardTitle>
+        <CardTitle>New Customers</CardTitle>
       </CardHeader>
 
       <CardContent className="grid grid-cols-3 gap-4">

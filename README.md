@@ -21,9 +21,10 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 
 ## Live Demo
 
-- **Frontend:** https://your-demo-url.com
-- **API Documentation:** https://your-api-url.com/docs
-
+| Resource | URL |
+|----------|-----|
+| 🌐 Application | https://bonus-management-system.vercel.app/ |
+| 📘 API Documentation (Swagger) | https://bonusmanagementsystem-production.up.railway.app/docs |
 ---
 
 ## Preview

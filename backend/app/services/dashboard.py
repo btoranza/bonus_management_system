@@ -149,7 +149,12 @@ async def get_dashboard_summary(year: int, month: int) -> DashboardResponse:
         )
         team_total_bonus = sum((item["bonus"] for item in team_results), Decimal(0))
         team_sales_count = sum(item["sales_count"] for item in team_results)
-        achievement_pct = _achievement_pct(team_total_sales, TEAM_MONTHLY_GOALS[team])
+        team_salespeople_count = len(team_results)
+        team_goal = TEAM_MONTHLY_GOALS[team] * team_salespeople_count
+        achievement_pct = _achievement_pct(
+            team_total_sales,
+            team_goal,
+        )
         team_average_sale = (
             (team_total_sales / team_sales_count).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP

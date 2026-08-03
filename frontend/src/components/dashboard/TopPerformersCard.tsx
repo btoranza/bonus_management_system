@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/card'
 
 import type { TopPerformer } from '@/types/dashboard.types'
+import { Trophy } from 'lucide-react'
 
 interface TopPerformersCardProps {
   topPerformers: TopPerformer[]
@@ -35,42 +36,55 @@ const TopPerformersCard = ({ topPerformers }: TopPerformersCardProps) => {
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col justify-between gap-3 overflow-y-auto">
-        {topPerformers.map((person, index) => (
-          <div
-            key={person.salesperson_id}
-            className="flex items-center justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <span className="w-4 text-sm font-semibold text-muted-foreground">
-                {index + 1}
-              </span>
+        {topPerformers.length === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
+            <Trophy className="mb-4 h-10 w-10 text-muted-foreground" />
 
-              <Avatar className="size-10">
-                <AvatarFallback
-                  className={
-                    avatarStyles[index + 1] ?? 'bg-muted text-muted-foreground'
-                  }
-                >
-                  {getInitials(person.name)}
-                </AvatarFallback>
-              </Avatar>
+            <p className="font-medium">No top performers yet</p>
 
-              <div>
-                <p className="font-medium leading-none">{person.name}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Top performers will appear once sales are registered.
+            </p>
+          </div>
+        ) : (
+          topPerformers.map((person, index) => (
+            <div
+              key={person.salesperson_id}
+              className="flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-4 text-sm font-semibold text-muted-foreground">
+                  {index + 1}
+                </span>
 
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {person.team}
+                <Avatar className="size-10">
+                  <AvatarFallback
+                    className={
+                      avatarStyles[index + 1] ??
+                      'bg-muted text-muted-foreground'
+                    }
+                  >
+                    {getInitials(person.name)}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div>
+                  <p className="font-medium leading-none">{person.name}</p>
+
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {person.team}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <p className="text-lg font-semibold tabular-nums">
+                  {Math.round(person.goal_achievement_pct)}%
                 </p>
               </div>
             </div>
-
-            <div className="text-right">
-              <p className="text-lg font-semibold tabular-nums">
-                {Math.round(person.goal_achievement_pct)}%
-              </p>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   )

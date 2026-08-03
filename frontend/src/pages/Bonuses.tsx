@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import DataTable from '@/components/ui/data-table'
 import { getBonusesTableColumns } from '@/components/bonus/BonusTableColumns'
 import TableToolbar from '@/components/ui/table-toolbar'
+import Spinner from '@/components/ui/spinner'
 import useDebounce from '@/hooks/use-debounce'
 import { useBonuses } from '@/hooks/use-bonuses'
 import { usePeriod } from '@/providers/PeriodProvider'
@@ -53,11 +54,7 @@ const Bonuses = () => {
     [sort, order],
   )
 
-  if (isPending) {
-    return <p>Loading...</p>
-  }
-
-  if (isError || !data) {
+  if (isError) {
     return <p>Failed to load bonuses.</p>
   }
 
@@ -74,13 +71,19 @@ const Bonuses = () => {
           filterOptions={TEAM_OPTIONS}
         />
 
-        <DataTable
-          columns={columns}
-          data={data.items}
-          page={page}
-          totalPages={data.total_pages}
-          onPageChange={setPage}
-        />
+        {isPending && !data ? (
+          <div className="flex h-[500px] items-center justify-center">
+            <Spinner />
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data?.items ?? []}
+            page={page}
+            totalPages={data?.total_pages ?? 1}
+            onPageChange={setPage}
+          />
+        )}
       </div>
     </div>
   )
