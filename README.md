@@ -30,7 +30,8 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 
 ### Dashboard
 
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./screenshots/dashboard_light.png)
+![Dashboard](./screenshots/dashboard_dark.png)
 
 ---
 
