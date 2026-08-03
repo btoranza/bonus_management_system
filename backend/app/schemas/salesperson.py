@@ -9,6 +9,7 @@ class Team(str, Enum):
     SMB = "SMB"
     MID_MARKET = "Mid-Market"
 
+
 class Salesperson(BaseModel):
     salesperson_id: str
     first_name: str
@@ -17,3 +18,11 @@ class Salesperson(BaseModel):
     team: Team
     hire_date: date
     active: bool
+
+
+class PaginatedSalespeopleResponse(BaseModel):
+    items: list[Salesperson]
+    total: int
+    page: int
+    limit: int
+    total_pages: int

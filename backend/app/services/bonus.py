@@ -5,23 +5,23 @@ from app.schemas.salesperson import Team
 
 # Fixed target bonus per team at ~100% goal achievement (midpoint of each team's expected range).
 TEAM_TARGET_BONUS: dict[Team, Decimal] = {
-    Team.ENTERPRISE: Decimal("5500"),
-    Team.MID_MARKET: Decimal("2750"),
-    Team.SMB: Decimal("1200"),
+    Team.ENTERPRISE: Decimal(5500),
+    Team.MID_MARKET: Decimal(2750),
+    Team.SMB: Decimal(1200),
 }
 
 # Enterprise deals are fewer but larger, SMB deals are smaller but more frequent.
 TEAM_MONTHLY_GOALS: dict[Team, Decimal] = {
-    Team.ENTERPRISE: Decimal("100000"),
-    Team.MID_MARKET: Decimal("50000"),
-    Team.SMB: Decimal("20000"),
+    Team.ENTERPRISE: Decimal(100000),
+    Team.MID_MARKET: Decimal(50000),
+    Team.SMB: Decimal(20000),
 }
 
 # Fixed amount awarded per unique new customer acquired in the period.
 NEW_CUSTOMER_BONUS: dict[Team, Decimal] = {
-    Team.ENTERPRISE: Decimal("800"),
-    Team.MID_MARKET: Decimal("500"),
-    Team.SMB: Decimal("300"),
+    Team.ENTERPRISE: Decimal(800),
+    Team.MID_MARKET: Decimal(500),
+    Team.SMB: Decimal(300),
 }
 
 # Caps the new-customer bonus so a handful of acquisitions can't outweigh the base bonus.
@@ -35,9 +35,15 @@ class BonusBreakdown:
     total_bonus: Decimal
 
 
-def _achievement_multiplier(total_sold: Decimal, monthly_goal: Decimal) -> Decimal:
+def _achievement_multiplier(
+    total_sold: Decimal,
+    monthly_goal: Decimal,
+) -> Decimal:
     if monthly_goal <= 0:
         return Decimal("1.0")
+
+    if total_sold <= 0:
+        return Decimal("0.0")
 
     achievement = total_sold / monthly_goal
 
@@ -67,9 +73,9 @@ def calculate_bonus(
 
     total_bonus = base_bonus + new_customer_bonus
 
-    quantize = lambda value: (
-        value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP).normalize()
-    )
+    quantize = lambda value: value.quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    ).normalize()
 
     return BonusBreakdown(
         base_bonus=quantize(base_bonus),

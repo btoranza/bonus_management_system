@@ -1,10 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 
-const GoalAchieversCard = () => {
-  const achievers = 14
-  const total = 20
-  const percentage = (achievers / total) * 100
+interface GoalAchieversCardProps {
+  goalAchieversCount: number
+  salespeopleCount: number
+}
+
+const GoalAchieversCard = ({
+  goalAchieversCount,
+  salespeopleCount,
+}: GoalAchieversCardProps) => {
+  const percentage =
+    salespeopleCount > 0 ? (goalAchieversCount / salespeopleCount) * 100 : 0
 
   return (
     <Card className="h-full">
@@ -16,16 +23,14 @@ const GoalAchieversCard = () => {
         <div className="flex items-end justify-between">
           <div>
             <p className="text-4xl font-bold tracking-tight">
-              {achievers}
+              {goalAchieversCount}
               <span className="ml-1 text-2xl font-medium text-muted-foreground">
-                / {total}
-                <span className="text-sm ml-2">
+                / {salespeopleCount}
+                <span className="ml-2 text-sm">
                   salespeople reached their goal
                 </span>
               </span>
             </p>
-
-            <p className="text-sm text-muted-foreground"></p>
           </div>
 
           <span className="text-2xl font-semibold tabular-nums">

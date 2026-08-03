@@ -1,9 +1,11 @@
-export type Team = 'Enterprise' | 'SMB' | 'Mid-Market'
+// Team names are open-ended and driven by the backend, not a fixed set.
+export type Team = 'Enterprise' | 'Mid-Market' | 'SMB'
 
-export interface TopSalesperson {
+export interface TopPerformer {
   salesperson_id: string
   name: string
   team: Team
+  goal_achievement_pct: number
   total_sales: number
   bonus: number
 }
@@ -21,6 +23,19 @@ export interface TeamBonus {
 export interface TeamAchievement {
   team: Team
   achievement_pct: number
+}
+
+export interface TeamAverageSale {
+  team: Team
+  average_sale: number
+  sales_count: number
+  average_sale_change_pct: number | null
+}
+
+export interface TeamNewCustomers {
+  team: Team
+  new_customers_count: number
+  new_customers_change_pct: number | null
 }
 
 export interface TrendPoint {
@@ -42,14 +57,12 @@ export interface DashboardResponse {
   sales_count: number
   sales_count_change_pct: number | null
   salespeople_count: number
-  new_customers_count: number
-  new_customers_change_pct: number | null
-  average_sale: number
-  average_sale_change_pct: number | null
+  new_customers_by_team: TeamNewCustomers[]
+  average_sale_by_team: TeamAverageSale[]
   goal_achievers_count: number
   sales_by_team: TeamSales[]
   bonus_by_team: TeamBonus[]
   goal_achievement_by_team: TeamAchievement[]
-  top_salespeople: TopSalesperson[]
+  top_performers: TopPerformer[]
   sales_trend: TrendPoint[]
 }

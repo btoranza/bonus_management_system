@@ -1,14 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatCurrency } from '@/lib/currency'
 
-const teams = [
-  { name: 'Enterprise', totalBonus: 24850 },
-  { name: 'Mid-Market', totalBonus: 13420 },
-  { name: 'SMB', totalBonus: 7860 },
-]
+import type { TeamBonus } from '@/types/dashboard.types'
 
-const formatCurrency = (value: number) => `€ ${value.toLocaleString('en-US')}`
+interface TotalBonusByTeamCardProps {
+  bonusByTeam: TeamBonus[]
+}
 
-const TotalBonusByTeamCard = () => {
+const TotalBonusByTeamCard = ({ bonusByTeam }: TotalBonusByTeamCardProps) => {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
@@ -16,12 +15,15 @@ const TotalBonusByTeamCard = () => {
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col justify-evenly">
-        {teams.map((team) => (
-          <div key={team.name} className="flex items-center justify-between">
-            <span className="font-medium">{team.name}</span>
+        {bonusByTeam.map(({ team, total_bonus }) => (
+          <div key={team} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-chart-1" />
+              <span className="font-medium">{team}</span>
+            </div>
 
             <span className="font-semibold tabular-nums">
-              {formatCurrency(team.totalBonus)}
+              {total_bonus > 0 ? formatCurrency(total_bonus) : '-'}
             </span>
           </div>
         ))}

@@ -1,18 +1,49 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ChangeIndicator from '@/components/ui/change-indicator'
 
-const NewCustomersCard = () => {
+import type { TeamNewCustomers } from '@/types/dashboard.types'
+
+interface NewCustomersCardProps {
+  newCustomersByTeam: TeamNewCustomers[]
+}
+
+const NewCustomersCard = ({ newCustomersByTeam }: NewCustomersCardProps) => {
   return (
-    <Card className="flex h-full flex-col">
+    <Card className="lg:h-full">
       <CardHeader>
-        <CardTitle>New Customers</CardTitle>
+        <CardTitle>New Customers by Team</CardTitle>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col items-center justify-center text-center">
-        <p className="text-4xl font-bold tracking-tight">34</p>
+      <CardContent className="grid grid-cols-3 gap-4">
+        {newCustomersByTeam.map(
+          ({ team, new_customers_count, new_customers_change_pct }) => {
+            const hasCustomers = new_customers_count > 0
 
-        <p className="mt-4 text-sm font-medium text-success">
-          27% of total customers
-        </p>
+            return (
+              <div key={team} className="text-center">
+                <p className="text-sm font-medium">{team}</p>
+
+                <p className="mt-2 text-2xl font-bold tracking-tight tabular-nums">
+                  {new_customers_count}
+                </p>
+
+                <p className="mt-1 text-xs">
+                  {hasCustomers ? (
+                    <ChangeIndicator
+                      value={new_customers_change_pct ?? 0}
+                      variant="arrow"
+                      className="text-xs"
+                    />
+                  ) : (
+                    <span className="text-muted-foreground">
+                      No new customers
+                    </span>
+                  )}
+                </p>
+              </div>
+            )
+          },
+        )}
       </CardContent>
     </Card>
   )

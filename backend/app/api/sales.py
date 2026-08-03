@@ -1,24 +1,99 @@
+import re
 from datetime import datetime, timezone
+from math import ceil
 
 from bson.decimal128 import Decimal128
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from app.database.client import db
-from app.schemas.sale import Sale, SaleResponse, SaleUpdate
+from app.schemas.sale import PaginatedSalesResponse, Sale, SaleResponse, SaleUpdate
+from app.schemas.salesperson import Team
+from app.services.dashboard import month_bounds
 
 router = APIRouter(prefix="/sales", tags=["sales"])
 
+SORTABLE_FIELDS = {"date", "amount"}
+SORT_ORDERS = {"asc": 1, "desc": -1}
 
-@router.get("/", response_model=list[SaleResponse])
-async def list_sales():
-    sales = await db.sales.find().to_list(length=100)
+
+def _salesperson_name(salesperson: dict) -> str:
+    return f"{salesperson['first_name']} {salesperson['last_name']}"
+
+
+@router.get("/", response_model=PaginatedSalesResponse)
+async def list_sales(
+    year: int,
+    month: int,
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    search: str | None = None,
+    team: str | None = None,
+    sort: str | None = None,
+    order: str | None = None,
+    # Reserved for future filters: salesperson_id, customer_status.
+):
+    if sort is not None and sort not in SORTABLE_FIELDS:
+        raise HTTPException(status_code=400, detail=f"Invalid sort field '{sort}'")
+    if order is not None and order not in SORT_ORDERS:
+        raise HTTPException(status_code=400, detail=f"Invalid order '{order}'")
+
+    sort_field = sort or "date"
+    sort_direction = SORT_ORDERS[order] if order else -1
+    start_date, end_date = month_bounds(year, month)
+    query: dict = {"date": {"$gte": start_date, "$lt": end_date}}
+
+    if search:
+        search_regex = {"$regex": re.escape(search), "$options": "i"}
+        salespeople_by_name = await db.salespeople.find(
+            {}, {"salesperson_id": 1, "first_name": 1, "last_name": 1}
+        ).to_list(length=None)
+        matching_salesperson_ids = [
+            salesperson["salesperson_id"]
+            for salesperson in salespeople_by_name
+            if search.lower() in _salesperson_name(salesperson).lower()
+        ]
+        query["$or"] = [
+            {"invoice_number": search_regex},
+            {"customer_name": search_regex},
+            {"salesperson_id": search_regex},
+            {"salesperson_id": {"$in": matching_salesperson_ids}},
+        ]
+
+    if team:
+        query["team"] = Team(team)
+
+    total = await db.sales.count_documents(query)
+    skip = (page - 1) * limit
+    sales = await (
+        db.sales.find(query)
+        .sort(sort_field, sort_direction)
+        .skip(skip)
+        .limit(limit)
+        .to_list(length=limit)
+    )
+
+    salespeople = await db.salespeople.find(
+        {"salesperson_id": {"$in": [sale["salesperson_id"] for sale in sales]}}
+    ).to_list(length=None)
+    salespeople_map = {
+        salesperson["salesperson_id"]: salesperson for salesperson in salespeople
+    }
 
     for sale in sales:
         sale["amount"] = sale["amount"].to_decimal()
+        sale["salesperson_name"] = _salesperson_name(
+            salespeople_map[sale["salesperson_id"]]
+        )
 
-    return sales
+    return PaginatedSalesResponse(
+        items=sales,
+        total=total,
+        page=page,
+        limit=limit,
+        total_pages=ceil(total / limit) if total else 0,
+    )
 
 
 @router.post("/", response_model=SaleResponse)
@@ -32,10 +107,12 @@ async def create_sale(sale: Sale):
 
     now = datetime.now(timezone.utc)
     sale_id = f"{sale.salesperson_id}-{sale.invoice_number}"
+    team = Team(salesperson["team"])
 
     sale_doc = sale.model_dump()
     sale_doc["sale_id"] = sale_id
     sale_doc["amount"] = Decimal128(str(sale.amount))
+    sale_doc["team"] = team
     sale_doc["created_at"] = now
     sale_doc["updated_at"] = now
 
@@ -50,6 +127,8 @@ async def create_sale(sale: Sale):
     return SaleResponse(
         **sale.model_dump(),
         sale_id=sale_id,
+        salesperson_name=_salesperson_name(salesperson),
+        team=team,
         created_at=now,
         updated_at=now,
     )
@@ -75,6 +154,9 @@ async def update_sale(sale_id: str, update: SaleUpdate):
     if sale is None:
         raise HTTPException(status_code=404, detail=f"Sale '{sale_id}' not found")
 
+    salesperson = await db.salespeople.find_one(
+        {"salesperson_id": sale["salesperson_id"]}
+    )
     sale["amount"] = sale["amount"].to_decimal()
+    sale["salesperson_name"] = _salesperson_name(salesperson)
     return sale
-

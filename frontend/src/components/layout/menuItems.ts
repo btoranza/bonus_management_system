@@ -12,6 +12,11 @@ export const menuItems = [
     icon: LayoutDashboard,
   },
   {
+    title: 'Bonuses',
+    href: '/bonuses',
+    icon: BadgeDollarSign,
+  },
+  {
     title: 'Sales',
     href: '/sales',
     icon: ReceiptText,
@@ -20,10 +25,5 @@ export const menuItems = [
     title: 'Salespeople',
     href: '/salespeople',
     icon: Users,
-  },
-  {
-    title: 'Bonuses',
-    href: '/bonuses',
-    icon: BadgeDollarSign,
   },
 ]
