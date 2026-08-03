@@ -112,30 +112,19 @@ To keep payouts balanced, new customer bonuses are capped so they cannot outweig
 
 ## Tech Stack
 
-### Frontend
+## Tech Stack
 
-⚛️ React
-🔷 TypeScript
-⚡ Vite
-🎨 Tailwind CSS
-🧩 shadcn/ui
-📦 TanStack Query
-📋 TanStack Table
-🛣️ React Router
-📈 Recharts
-
-### Backend
-
-⚡ FastAPI
-🍃 MongoDB Atlas
-🚀 Motor
-✅ Pydantic
-
-### Tooling
-
-🧹 Ruff
-✨ ESLint
-🎯 Prettier
+| Frontend | Backend | Tooling |
+|----------|----------|----------|
+| ⚛️ React | ⚡ FastAPI | 🧹 Ruff |
+| 🔷 TypeScript | 🍃 MongoDB Atlas | ✨ ESLint |
+| ⚡ Vite | 🚀 Motor | 🎯 Prettier |
+| 🎨 Tailwind CSS | ✅ Pydantic | |
+| 🧩 shadcn/ui | | |
+| 📦 TanStack Query | | |
+| 📋 TanStack Table | | |
+| 🛣️ React Router | | |
+| 📈 Recharts | | |
 
 ---
 
