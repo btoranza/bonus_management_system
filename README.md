@@ -55,16 +55,34 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 
 ## Features
 
-- 📊 Interactive dashboard with KPIs and monthly trends
-- 💰 Monthly bonus calculation based on configurable business rules
-- 👥 Salespeople management
-- 🧾 Sales management
-- 🔎 Server-side search, filtering, sorting and pagination
-- 📈 Performance analytics
-- 🌙 Dark mode
-- 📱 Responsive interface
+### 📊 Analytics
 
----
+- Interactive dashboard
+- KPIs
+- Monthly trends
+- Performance analytics
+
+### 💼 Sales
+
+- Sales management
+- Search
+- Filtering
+- Server-side pagination
+- Sorting
+
+### 👥 Salespeople
+
+- Salespeople management
+
+### 💰 Bonuses
+
+- Monthly bonus calculation
+- Configurable business rules
+
+### 🎨 User Experience
+
+- Responsive interface
+- Dark mode
 
 ## Business Rules
 
@@ -96,47 +114,66 @@ To keep payouts balanced, new customer bonuses are capped so they cannot outweig
 
 ### Frontend
 
-- React
-- TypeScript
-- Vite
-- React Router
-- Tailwind CSS
-- shadcn/ui
-- TanStack Query
-- TanStack Table
-- Recharts
+⚛️ React
+🔷 TypeScript
+⚡ Vite
+🎨 Tailwind CSS
+🧩 shadcn/ui
+📦 TanStack Query
+📋 TanStack Table
+🛣️ React Router
+📈 Recharts
 
 ### Backend
 
-- FastAPI
-- Motor
-- MongoDB Atlas
-- Pydantic
+⚡ FastAPI
+🍃 MongoDB Atlas
+🚀 Motor
+✅ Pydantic
 
 ### Tooling
 
-- Ruff
-- ESLint
-- Prettier
+🧹 Ruff
+✨ ESLint
+🎯 Prettier
 
 ---
 
 ## Architecture
 
 ```mermaid
-flowchart TD
+flowchart LR
 
-UI["React + TypeScript"]
+subgraph Frontend
+    P["📄 Pages"]
+    H["🪝 Hooks"]
+    C["🧩 Components"]
+    S["🌐 API Services"]
+end
 
-Query["TanStack Query"]
+subgraph Backend
+    A["⚡ FastAPI Routes"]
+    B["🧠 Business Services"]
+    D["🍃 MongoDB Atlas"]
+end
 
-API["FastAPI"]
+P --> H
+P --> C
+H --> S
+S --> A
+A --> B
+B --> D
 
-Mongo["MongoDB Atlas"]
+classDef frontend fill:#F8FFFF,stroke:#2EC4B6,stroke-width:2px,color:#2B2D42;
+classDef backend fill:#FAF8FF,stroke:#A78BFA,stroke-width:2px,color:#2B2D42;
+classDef database fill:#F8FFF9,stroke:#37C871,stroke-width:2px,color:#2B2D42;
 
-UI --> Query
-Query --> API
-API --> Mongo
+class P,H,C,S frontend;
+class A,B backend;
+class D database;
+
+style Frontend fill:#FFFFFF,stroke:#2B2D42,stroke-width:2px;
+style Backend fill:#FFFFFF,stroke:#2B2D42,stroke-width:2px;
 ```
 
 ---
