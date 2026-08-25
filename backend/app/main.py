@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.bonus import router as bonus_router
+from app.api.customers import router as customers_router
 from app.api.dashboard import router as dashboard_router
 from app.api.sales import router as sales_router
 from app.api.salespeople import router as salespeople_router
@@ -40,6 +41,7 @@ app.include_router(sales_router)
 app.include_router(salespeople_router)
 app.include_router(bonus_router)
 app.include_router(dashboard_router)
+app.include_router(customers_router)
 
 
 @app.get("/")

@@ -7,15 +7,9 @@ import { TEAM_OPTIONS } from '@/constants/teams'
 import { useSales } from '@/hooks/use-sales'
 import { usePeriod } from '@/providers/PeriodProvider'
 import type { SalesSort, SortOrder } from '@/types/sale.types'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 import TableToolbar from '@/components/ui/table-toolbar'
 import Spinner from '@/components/ui/spinner'
+import CreateSaleDialog from '@/components/sales/CreateSaleDialog'
 
 const Sales = () => {
   const { period } = usePeriod()
@@ -87,23 +81,7 @@ const Sales = () => {
 
       <footer className="mt-auto pt-5">
         <div className="flex justify-end">
-          <Tooltip>
-            <TooltipTrigger render={<span />}>
-              <Button
-                size="lg"
-                variant="default"
-                className="min-w-40 cursor-not-allowed opacity-60"
-                onClick={(e) => e.preventDefault()}
-              >
-                <Plus className="size-5" />
-                New Sale
-              </Button>
-            </TooltipTrigger>
-
-            <TooltipContent>
-              <p>Coming soon!</p>
-            </TooltipContent>
-          </Tooltip>
+          <CreateSaleDialog />
         </div>
       </footer>
     </div>

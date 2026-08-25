@@ -81,11 +81,11 @@ TEAM_ABBREVIATION: dict[Team, str] = {
 #   - median > 1.0 shifts the odds of beating goal above 50%, but never to 100%
 #   - median < 1.0 shifts the odds below 50%, but a lucky big month can still happen
 PROFILE_MEDIAN_FACTOR: dict[Profile, float] = {
-    "top": 1.5,      # consistently above goal
-    "good": 1.25,     # usually above goal
-    "average": 1.0,   # ~50/50 every month
-    "low": 0.65,      # occasionally beats goal
-    "new": 0.4,       # rarely beats goal, still ramping up
+    "top": 1.5,  # consistently above goal
+    "good": 1.25,  # usually above goal
+    "average": 1.0,  # ~50/50 every month
+    "low": 0.65,  # occasionally beats goal
+    "new": 0.4,  # rarely beats goal, still ramping up
 }
 
 # Spread (sigma, in log-space) of each profile's monthly revenue distribution.
@@ -149,55 +149,178 @@ SEASONALITY_BY_MONTH: dict[int, float] = {
 }
 
 PERIOD_START: tuple[int, int] = (2025, 8)
-PERIOD_END: tuple[int, int] = (2026, 7)  # inclusive
+PERIOD_END: tuple[int, int] = (2026, 8)  # inclusive
 
 COMPANY_PREFIXES: list[str] = [
-    "Nova", "Atlas", "Lumière", "Horizon", "Vertex", "Solstice", "Aster",
-    "Norden", "Ondine", "Kalima", "Solenne", "Brume", "Aurore", "Tangram",
-    "Ilios", "Mercure", "Zephyr", "Cristal", "Méridien", "Argenta",
-    "Belora", "Cassia", "Delphine", "Elyria", "Fontaine",
+    "Nova",
+    "Atlas",
+    "Lumière",
+    "Horizon",
+    "Vertex",
+    "Solstice",
+    "Aster",
+    "Norden",
+    "Ondine",
+    "Kalima",
+    "Solenne",
+    "Brume",
+    "Aurore",
+    "Tangram",
+    "Ilios",
+    "Mercure",
+    "Zephyr",
+    "Cristal",
+    "Méridien",
+    "Argenta",
+    "Belora",
+    "Cassia",
+    "Delphine",
+    "Elyria",
+    "Fontaine",
 ]
 
 COMPANY_SUFFIXES: list[str] = [
-    "Solutions", "Technologies", "Group", "Industries", "Consulting",
-    "Systems", "Partners", "Digital", "Innovations", "Corp", "& Associés",
-    "Logistique", "Capital", "Dynamics", "Réseaux",
+    "Solutions",
+    "Technologies",
+    "Group",
+    "Industries",
+    "Consulting",
+    "Systems",
+    "Partners",
+    "Digital",
+    "Innovations",
+    "Corp",
+    "& Associés",
+    "Logistique",
+    "Capital",
+    "Dynamics",
+    "Réseaux",
 ]
 
 SALESPEOPLE_SEED: list[dict] = [
     # Enterprise
-    {"id": 1001, "first_name": "Camille", "last_name": "Durand", "team": "Enterprise", "profile": "top",
-     "hire_date": datetime(2021, 3, 15, tzinfo=timezone.utc)},
-    {"id": 1002, "first_name": "Pierre", "last_name": "Lefebvre", "team": "Enterprise", "profile": "good",
-     "hire_date": datetime(2022, 6, 1, tzinfo=timezone.utc)},
-    {"id": 1003, "first_name": "Chloé", "last_name": "Bernard", "team": "Enterprise", "profile": "average",
-     "hire_date": datetime(2022, 11, 10, tzinfo=timezone.utc)},
-    {"id": 1004, "first_name": "Julien", "last_name": "Moreau", "team": "Enterprise", "profile": "low",
-     "hire_date": datetime(2023, 2, 20, tzinfo=timezone.utc)},
-    {"id": 1005, "first_name": "Léa", "last_name": "Dubois", "team": "Enterprise", "profile": "new",
-     "hire_date": datetime(2026, 3, 2, tzinfo=timezone.utc)},
+    {
+        "id": 1001,
+        "first_name": "Camille",
+        "last_name": "Durand",
+        "team": "Enterprise",
+        "profile": "top",
+        "hire_date": datetime(2021, 3, 15, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1002,
+        "first_name": "Pierre",
+        "last_name": "Lefebvre",
+        "team": "Enterprise",
+        "profile": "good",
+        "hire_date": datetime(2022, 6, 1, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1003,
+        "first_name": "Chloé",
+        "last_name": "Bernard",
+        "team": "Enterprise",
+        "profile": "average",
+        "hire_date": datetime(2022, 11, 10, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1004,
+        "first_name": "Julien",
+        "last_name": "Moreau",
+        "team": "Enterprise",
+        "profile": "low",
+        "hire_date": datetime(2023, 2, 20, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1005,
+        "first_name": "Léa",
+        "last_name": "Dubois",
+        "team": "Enterprise",
+        "profile": "new",
+        "hire_date": datetime(2026, 3, 2, tzinfo=timezone.utc),
+    },
     # Mid-Market
-    {"id": 1006, "first_name": "Antoine", "last_name": "Girard", "team": "Mid-Market", "profile": "top",
-     "hire_date": datetime(2020, 9, 5, tzinfo=timezone.utc)},
-    {"id": 1007, "first_name": "Manon", "last_name": "Faure", "team": "Mid-Market", "profile": "good",
-     "hire_date": datetime(2021, 7, 12, tzinfo=timezone.utc)},
-    {"id": 1008, "first_name": "Nicolas", "last_name": "Petit", "team": "Mid-Market", "profile": "average",
-     "hire_date": datetime(2022, 4, 18, tzinfo=timezone.utc)},
-    {"id": 1009, "first_name": "Sophie", "last_name": "Lambert", "team": "Mid-Market", "profile": "low",
-     "hire_date": datetime(2023, 8, 1, tzinfo=timezone.utc)},
-    {"id": 1010, "first_name": "Hugo", "last_name": "Simon", "team": "Mid-Market", "profile": "new",
-     "hire_date": datetime(2025, 11, 17, tzinfo=timezone.utc)},
+    {
+        "id": 1006,
+        "first_name": "Antoine",
+        "last_name": "Girard",
+        "team": "Mid-Market",
+        "profile": "top",
+        "hire_date": datetime(2020, 9, 5, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1007,
+        "first_name": "Manon",
+        "last_name": "Faure",
+        "team": "Mid-Market",
+        "profile": "good",
+        "hire_date": datetime(2021, 7, 12, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1008,
+        "first_name": "Nicolas",
+        "last_name": "Petit",
+        "team": "Mid-Market",
+        "profile": "average",
+        "hire_date": datetime(2022, 4, 18, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1009,
+        "first_name": "Sophie",
+        "last_name": "Lambert",
+        "team": "Mid-Market",
+        "profile": "low",
+        "hire_date": datetime(2023, 8, 1, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1010,
+        "first_name": "Hugo",
+        "last_name": "Simon",
+        "team": "Mid-Market",
+        "profile": "new",
+        "hire_date": datetime(2025, 11, 17, tzinfo=timezone.utc),
+    },
     # SMB
-    {"id": 1011, "first_name": "Emma", "last_name": "Rousseau", "team": "SMB", "profile": "top",
-     "hire_date": datetime(2021, 1, 25, tzinfo=timezone.utc)},
-    {"id": 1012, "first_name": "Louis", "last_name": "Martin", "team": "SMB", "profile": "good",
-     "hire_date": datetime(2022, 3, 9, tzinfo=timezone.utc)},
-    {"id": 1013, "first_name": "Inès", "last_name": "Michel", "team": "SMB", "profile": "average",
-     "hire_date": datetime(2022, 10, 3, tzinfo=timezone.utc)},
-    {"id": 1014, "first_name": "Thomas", "last_name": "Garcia", "team": "SMB", "profile": "low",
-     "hire_date": datetime(2023, 5, 22, tzinfo=timezone.utc)},
-    {"id": 1015, "first_name": "Océane", "last_name": "Fontaine", "team": "SMB", "profile": "new",
-     "hire_date": datetime(2026, 5, 4, tzinfo=timezone.utc)},
+    {
+        "id": 1011,
+        "first_name": "Emma",
+        "last_name": "Rousseau",
+        "team": "SMB",
+        "profile": "top",
+        "hire_date": datetime(2021, 1, 25, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1012,
+        "first_name": "Louis",
+        "last_name": "Martin",
+        "team": "SMB",
+        "profile": "good",
+        "hire_date": datetime(2022, 3, 9, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1013,
+        "first_name": "Inès",
+        "last_name": "Michel",
+        "team": "SMB",
+        "profile": "average",
+        "hire_date": datetime(2022, 10, 3, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1014,
+        "first_name": "Thomas",
+        "last_name": "Garcia",
+        "team": "SMB",
+        "profile": "low",
+        "hire_date": datetime(2023, 5, 22, tzinfo=timezone.utc),
+    },
+    {
+        "id": 1015,
+        "first_name": "Océane",
+        "last_name": "Fontaine",
+        "team": "SMB",
+        "profile": "new",
+        "hire_date": datetime(2026, 5, 4, tzinfo=timezone.utc),
+    },
 ]
 
 
@@ -213,6 +336,7 @@ class CustomerPool:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _slugify(text: str) -> str:
     """Strip accents and lowercase text, for building ASCII-safe emails."""
@@ -232,14 +356,22 @@ def _iter_months(start: tuple[int, int], end: tuple[int, int]):
             year += 1
 
 
-def _random_datetime_in_month(year: int, month: int, min_day: int = 1) -> datetime:
+def _random_datetime_in_month(
+    year: int,
+    month: int,
+    min_day: int = 1,
+    max_day: int | None = None,
+) -> datetime:
     """Return a random UTC datetime within business hours in the given month."""
     days_in_month = calendar.monthrange(year, month)[1]
     start_day = min(min_day, days_in_month)
-    day = random.randint(start_day, days_in_month)
+    end_day = min(max_day or days_in_month, days_in_month)
+
+    day = random.randint(start_day, end_day)
     hour = random.randint(8, 18)
     minute = random.randint(0, 59)
     second = random.randint(0, 59)
+
     return datetime(year, month, day, hour, minute, second, tzinfo=timezone.utc)
 
 
@@ -248,15 +380,17 @@ def _build_salespeople_documents() -> list[dict]:
     documents = []
     for person in SALESPEOPLE_SEED:
         email = f"{_slugify(person['first_name'])}.{_slugify(person['last_name'])}@acmecorp.com"
-        documents.append({
-            "salesperson_id": f"SP-{person['id']}",
-            "first_name": person["first_name"],
-            "last_name": person["last_name"],
-            "email": email,
-            "team": person["team"],
-            "hire_date": person["hire_date"],
-            "active": True,
-        })
+        documents.append(
+            {
+                "salesperson_id": f"SP-{person['id']}",
+                "first_name": person["first_name"],
+                "last_name": person["last_name"],
+                "email": email,
+                "team": person["team"],
+                "hire_date": person["hire_date"],
+                "active": True,
+            }
+        )
     return documents
 
 
@@ -312,7 +446,9 @@ def _generate_monthly_sale_count(team: Team, profile: Profile) -> int:
     return random.randint(range_low, range_high)
 
 
-def _generate_monthly_revenue(team: Team, profile: Profile, seasonality: float) -> float:
+def _generate_monthly_revenue(
+    team: Team, profile: Profile, seasonality: float
+) -> float:
     """Draw this salesperson's total revenue for one month.
 
     Modeled as log-normal so the outcome has real month-to-month randomness:
@@ -333,7 +469,9 @@ def _generate_monthly_revenue(team: Team, profile: Profile, seasonality: float) 
     return min(revenue, revenue_ceiling)
 
 
-def _generate_monthly_amounts(team: Team, profile: Profile, seasonality: float, sale_count: int) -> list[Decimal]:
+def _generate_monthly_amounts(
+    team: Team, profile: Profile, seasonality: float, sale_count: int
+) -> list[Decimal]:
     """Split a month's total revenue unevenly across that month's deals.
 
     Each deal's share is only soft-clipped (a wide multiple of the team's
@@ -375,27 +513,40 @@ def _generate_sales(pools: dict[Team, CustomerPool]) -> list[dict]:
             profile: Profile = person["profile"]
             pool = pools[team]
 
-            min_day = hire_date.day if (year, month) == (hire_date.year, hire_date.month) else 1
+            min_day = (
+                hire_date.day
+                if (year, month) == (hire_date.year, hire_date.month)
+                else 1
+            )
             sale_count = _generate_monthly_sale_count(team, profile)
             amounts = _generate_monthly_amounts(team, profile, seasonality, sale_count)
 
             for amount in amounts:
                 customer_id, customer_name, customer_status = _pick_customer(pool, team)
-                sale_date = _random_datetime_in_month(year, month, min_day=min_day)
+                max_day = 24 if (year, month) == (2026, 8) else None
 
-                sales.append({
-                    "sale_id": f"SALE-{sale_counter:06d}",
-                    "invoice_number": f"INV-{year}{month:02d}-{invoice_counter:05d}",
-                    "customer_id": customer_id,
-                    "customer_name": customer_name,
-                    "customer_status": customer_status,
-                    "salesperson_id": f"SP-{person['id']}",
-                    "team": team,
-                    "amount": Decimal128(amount),
-                    "date": sale_date,
-                    "created_at": sale_date,
-                    "updated_at": sale_date,
-                })
+                sale_date = _random_datetime_in_month(
+                    year,
+                    month,
+                    min_day=min_day,
+                    max_day=max_day,
+                )
+
+                sales.append(
+                    {
+                        "sale_id": f"SALE-{sale_counter:06d}",
+                        "invoice_number": f"INV-{year}{month:02d}-{invoice_counter:05d}",
+                        "customer_id": customer_id,
+                        "customer_name": customer_name,
+                        "customer_status": customer_status,
+                        "salesperson_id": f"SP-{person['id']}",
+                        "team": team,
+                        "amount": Decimal128(amount),
+                        "date": sale_date,
+                        "created_at": sale_date,
+                        "updated_at": sale_date,
+                    }
+                )
                 sale_counter += 1
                 invoice_counter += 1
 
@@ -440,6 +591,7 @@ def _print_summary(sales: list[dict]) -> None:
 # Database operations
 # ---------------------------------------------------------------------------
 
+
 async def _clear_collections() -> None:
     await db.salespeople.delete_many({})
     await db.sales.delete_many({})
@@ -458,6 +610,7 @@ async def _insert_sales(documents: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 async def main() -> None:
     random.seed(SEED)
