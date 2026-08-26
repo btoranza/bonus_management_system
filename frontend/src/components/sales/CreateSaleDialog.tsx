@@ -1,13 +1,13 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import SaleForm from './SaleForm'
 
 const CreateSaleDialog = () => {
   return (
@@ -24,9 +24,7 @@ const CreateSaleDialog = () => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New Sale</DialogTitle>
-          <DialogDescription>
-            Enter the details of the new sale.
-          </DialogDescription>
+          <SaleForm />
         </DialogHeader>
       </DialogContent>
     </Dialog>

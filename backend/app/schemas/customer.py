@@ -1,6 +1,12 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
+
+
+class CustomerStatus(str, Enum):
+    NEW = "new"
+    EXISTING = "existing"
 
 
 class CustomerCreate(BaseModel):
@@ -10,6 +16,7 @@ class CustomerCreate(BaseModel):
 class CustomerResponse(BaseModel):
     customer_id: str
     customer_name: str
+    status: CustomerStatus
     created_at: datetime
     updated_at: datetime
 

@@ -58,14 +58,26 @@ async def _aggregate_sales(year: int, month: int) -> list[dict]:
             }
         },
         {
+            "$lookup": {
+                "from": "customers",
+                "localField": "customer_id",
+                "foreignField": "customer_id",
+                "as": "customer",
+            }
+        },
+        {"$unwind": "$customer"},
+        {
             "$group": {
-                "_id": {"salesperson_id": "$salesperson_id", "team": "$team"},
+                "_id": {
+                    "salesperson_id": "$salesperson_id",
+                    "team": "$team",
+                },
                 "total_sales": {"$sum": "$amount"},
                 "sales_count": {"$sum": 1},
                 "new_customers": {
                     "$addToSet": {
                         "$cond": [
-                            {"$eq": ["$customer_status", "new"]},
+                            {"$eq": ["$customer.status", "new"]},
                             "$customer_id",
                             "$$REMOVE",
                         ]
