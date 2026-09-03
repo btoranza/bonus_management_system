@@ -65,6 +65,8 @@ async def create_customer(customer: CustomerCreate):
     customer_doc = {
         "customer_id": customer_id,
         "customer_name": customer.customer_name,
+        "status": "new",
+        "first_sale_date": None,
         "created_at": now,
         "updated_at": now,
     }

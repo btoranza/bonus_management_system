@@ -17,6 +17,7 @@ class CustomerResponse(BaseModel):
     customer_id: str
     customer_name: str
     status: CustomerStatus
+    first_sale_date: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

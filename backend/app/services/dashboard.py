@@ -77,7 +77,13 @@ async def _aggregate_sales(year: int, month: int) -> list[dict]:
                 "new_customers": {
                     "$addToSet": {
                         "$cond": [
-                            {"$eq": ["$customer.status", "new"]},
+                            {
+                                "$and": [
+                                    {"$eq": ["$customer.status", "new"]},
+                                    {"$gte": ["$customer.first_sale_date", start_date]},
+                                    {"$lt": ["$customer.first_sale_date", end_date]},
+                                ]
+                            },
                             "$customer_id",
                             "$$REMOVE",
                         ]

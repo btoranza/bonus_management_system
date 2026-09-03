@@ -196,6 +196,12 @@ async def create_sale(sale: Sale):
             detail=f"Sale '{sale_id}' already exists",
         )
 
+    # $min sets first_sale_date on first insert and keeps the earliest date afterwards
+    await db.customers.update_one(
+        {"customer_id": sale.customer_id},
+        {"$min": {"first_sale_date": sale.date}},
+    )
+
     return SaleResponse(
         **sale.model_dump(),
         customer_name=customer["customer_name"],

@@ -99,7 +99,21 @@ async def list_bonuses(
                     }
                 ],
                 "new_customers": [
-                    {"$match": {"customer_status": "new"}},
+                    {
+                        "$lookup": {
+                            "from": "customers",
+                            "localField": "customer_id",
+                            "foreignField": "customer_id",
+                            "as": "customer",
+                        }
+                    },
+                    {"$unwind": "$customer"},
+                    {
+                        "$match": {
+                            "customer.status": "new",
+                            "customer.first_sale_date": {"$gte": start, "$lt": end},
+                        }
+                    },
                     {
                         "$group": {
                             "_id": {
@@ -219,7 +233,21 @@ async def get_salesperson_bonus(
                     }
                 ],
                 "new_customers": [
-                    {"$match": {"customer_status": "new"}},
+                    {
+                        "$lookup": {
+                            "from": "customers",
+                            "localField": "customer_id",
+                            "foreignField": "customer_id",
+                            "as": "customer",
+                        }
+                    },
+                    {"$unwind": "$customer"},
+                    {
+                        "$match": {
+                            "customer.status": "new",
+                            "customer.first_sale_date": {"$gte": start, "$lt": end},
+                        }
+                    },
                     {"$group": {"_id": "$customer_id"}},
                     {"$count": "count"},
                 ],
