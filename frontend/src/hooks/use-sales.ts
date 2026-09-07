@@ -1,6 +1,11 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
-import { getSales } from '@/services/sales.service'
+import { createSale, getSales } from '@/services/sales.service'
 import type { SalesParams } from '@/types/sale.types'
 
 export const useSales = ({
@@ -27,5 +32,19 @@ export const useSales = ({
         order,
       }),
     placeholderData: keepPreviousData,
+  })
+}
+
+export const useCreateSale = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['bonuses'] })
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
+    },
   })
 }

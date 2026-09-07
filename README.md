@@ -39,6 +39,8 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 ### Sales
 
 ![Sales](./screenshots/sales.png)
+![Sales](./screenshots/new_sale.png)
+![Sales](./screenshots/new_customer.png)
 
 ---
 
@@ -66,6 +68,8 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 ### 💼 Sales
 
 - Sales management
+- Sale creation with inline customer lookup and creation
+- Toast notifications for user feedback
 - Search
 - Filtering
 - Server-side pagination
@@ -74,6 +78,11 @@ The platform is designed to evolve into a multi-role system supporting Finance, 
 ### 👥 Salespeople
 
 - Salespeople management
+
+### 🧑‍🤝‍🧑 Customers
+
+- Customer lookup with search
+- Inline customer creation from the sale form
 
 ### 💰 Bonuses
 
@@ -168,6 +177,83 @@ style Backend fill:#FFFFFF,stroke:#2B2D42,stroke-width:2px;
 
 ---
 
+```mermaid
+flowchart LR
+
+    A["Open New Sale"] --> B["SaleForm"]
+
+    B --> C["CustomerCombobox"]
+    C --> D{"Customer exists?"}
+
+    D -->|Yes| E["Select customer"]
+    E --> F["Complete form"]
+
+    D -->|No| G["+ New customer"]
+    G --> H["NewCustomerForm"]
+    H --> I["POST /customers"]
+    I --> J["CUST-NNNNNN created"]
+    J --> K["Return to SaleForm"]
+    K --> L["Auto-select customer"]
+    L --> F
+
+    F --> M["Submit sale"]
+    M --> N["POST /sales"]
+    N --> O["Create sale_id"]
+    O --> P["Update first_sale_date"]
+    P --> Q["Success toast"]
+    Q --> R["Close & reset dialog"]
+    R --> S["Invalidate queries"]
+
+    classDef frontend fill:#F8FFFF,stroke:#2EC4B6,stroke-width:2px,color:#2B2D42;
+    classDef decision fill:#FAF8FF,stroke:#A78BFA,stroke-width:2px,color:#2B2D42;
+    classDef backend fill:#F8FFF9,stroke:#37C871,stroke-width:2px,color:#2B2D42;
+
+    class A,B,C,E,F,G,H,K,L,M,Q,R,S frontend;
+    class D decision;
+    class I,J,N,O,P backend;
+```
+
+### **New Customer Creation**
+
+The customer creation flow is handled directly within the **New Sale** dialog, allowing users to create a customer without closing or leaving the sale form.
+
+1. The user opens `NewCustomerForm` within the existing dialog.
+2. The user enters the customer name.
+3. The name is validated using Zod.
+4. On submit, `useCreateCustomer()` triggers `POST /customers`.
+5. The backend creates the customer and returns the generated customer ID.
+6. On success:
+   - The form is reset.
+   - `onCreated()` is called with the customer's ID and name.
+7. `CreateSaleDialog` receives the newly created customer and returns to the `SaleForm` panel.
+8. `CustomerCombobox` displays the new customer as the selected value.
+
+```mermaid
+flowchart LR
+
+    A["NewCustomerForm"] --> B["Enter customer name"]
+    B --> C["Zod validation"]
+    C --> D["Submit"]
+    D --> E["useCreateCustomer()"]
+    E --> F["POST /customers"]
+    F --> G["Customer created<br/>ID generated"]
+    G --> H["onSuccess"]
+    H --> I["Reset form"]
+    I --> J["onCreated({ value, label })"]
+    J --> K["CreateSaleDialog<br/>returns to SaleForm"]
+    K --> L["CustomerCombobox<br/>customer selected"]
+
+    classDef frontend fill:#F8FFFF,stroke:#2EC4B6,stroke-width:2px,color:#2B2D42;
+    classDef validation fill:#FAF8FF,stroke:#A78BFA,stroke-width:2px,color:#2B2D42;
+    classDef backend fill:#F8FFF9,stroke:#37C871,stroke-width:2px,color:#2B2D42;
+
+    class A,B,D,E,H,I,J,K,L frontend;
+    class C validation;
+    class F,G backend;
+```
+
+---
+
 ## Design Principles
 
 The project follows a layered architecture that separates presentation, business logic, and data access.
@@ -197,6 +283,8 @@ The project follows a layered architecture that separates presentation, business
 | POST | `/sales` | Create a sale |
 | PATCH | `/sales/{sale_id}` | Update a sale |
 | GET | `/salespeople` | List salespeople |
+| GET | `/customers` | List customers |
+| POST | `/customers` | Create a customer |
 | GET | `/bonuses` | Calculate and list monthly bonuses |
 | GET | `/docs` | Interactive OpenAPI (Swagger UI) documentation |
 

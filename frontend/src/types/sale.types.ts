@@ -15,6 +15,14 @@ export interface Sale {
   updated_at: string
 }
 
+export interface SaleCreate {
+  salesperson_id: string
+  invoice_number: string
+  customer_id: string
+  amount: number
+  date: string
+}
+
 export type SalesSort = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
 

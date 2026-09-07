@@ -1,15 +1,19 @@
-"""Seed script for populating MongoDB with realistic salespeople and sales data.
+"""Seed script for populating MongoDB with realistic salespeople, sales and
+customer data.
 
 Run with:
     python app/scripts/seed.py
 
-Clears `salespeople` and `sales` collections and regenerates them with
-coherent, story-driven data: seasonality, per-salesperson performance
-profiles, repeat customers and varied bonus outcomes.
+Clears the `salespeople`, `sales` and `customers` collections and regenerates
+them with coherent, story-driven data: seasonality, per-salesperson
+performance profiles, repeat customers and varied bonus outcomes. Sales are
+always generated from `PERIOD_START` up through the current month/day, so
+re-running the script at a later date keeps the dataset up to date.
 """
 
 import asyncio
 import calendar
+import itertools
 import math
 import random
 import unicodedata
@@ -28,7 +32,6 @@ from app.database.client import db
 
 Team = Literal["Enterprise", "Mid-Market", "SMB"]
 Profile = Literal["top", "good", "average", "low", "new"]
-CustomerStatus = Literal["new", "existing"]
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -66,12 +69,6 @@ TEAM_NEW_CUSTOMER_PROBABILITY: dict[Team, float] = {
     "Enterprise": 0.20,
     "Mid-Market": 0.15,
     "SMB": 0.10,
-}
-
-TEAM_ABBREVIATION: dict[Team, str] = {
-    "Enterprise": "ENT",
-    "Mid-Market": "MID",
-    "SMB": "SMB",
 }
 
 # Each profile's monthly revenue is drawn from a log-normal distribution
@@ -148,8 +145,12 @@ SEASONALITY_BY_MONTH: dict[int, float] = {
     12: 1.5,  # December - year-end push
 }
 
+# The seed always regenerates data up through "today", so it can be re-run at
+# any point in time and keep the dataset up to date.
+TODAY = datetime.now(timezone.utc)
+
 PERIOD_START: tuple[int, int] = (2025, 8)
-PERIOD_END: tuple[int, int] = (2026, 8)  # inclusive
+PERIOD_END: tuple[int, int] = (TODAY.year, TODAY.month)  # inclusive
 
 COMPANY_PREFIXES: list[str] = [
     "Nova",
@@ -330,7 +331,6 @@ class CustomerPool:
 
     team: Team
     customers: list[dict] = field(default_factory=list)
-    next_seq: int = 1
 
 
 # ---------------------------------------------------------------------------
@@ -398,36 +398,37 @@ def _random_company_name() -> str:
     return f"{random.choice(COMPANY_PREFIXES)} {random.choice(COMPANY_SUFFIXES)}"
 
 
-def _generate_customer(team: Team, seq: int) -> dict:
-    abbreviation = TEAM_ABBREVIATION[team]
+def _generate_customer(customer_seq: int) -> dict:
+    """Build a customer using the same `CUST-NNNNNN` id format as POST /customers."""
     return {
-        "customer_id": f"CUST-{abbreviation}-{seq:04d}",
+        "customer_id": f"CUST-{customer_seq:06d}",
         "customer_name": _random_company_name(),
     }
 
 
-def _build_initial_customer_pools() -> dict[Team, CustomerPool]:
+def _build_initial_customer_pools(customer_seq: itertools.count) -> dict[Team, CustomerPool]:
     """Pre-populate each team's customer pool with a random set of customers."""
     pools: dict[Team, CustomerPool] = {}
     for team in TEAMS:
         min_size, max_size = TEAM_CUSTOMER_POOL_RANGE[team]
         size = random.randint(min_size, max_size)
-        customers = [_generate_customer(team, seq) for seq in range(1, size + 1)]
-        pools[team] = CustomerPool(team=team, customers=customers, next_seq=size + 1)
+        customers = [_generate_customer(next(customer_seq)) for _ in range(size)]
+        pools[team] = CustomerPool(team=team, customers=customers)
     return pools
 
 
-def _pick_customer(pool: CustomerPool, team: Team) -> tuple[str, str, CustomerStatus]:
+def _pick_customer(
+    pool: CustomerPool, team: Team, customer_seq: itertools.count
+) -> tuple[str, str]:
     """Pick an existing customer or create a new one, updating the pool in place."""
     is_new = random.random() < TEAM_NEW_CUSTOMER_PROBABILITY[team]
     if is_new:
-        customer = _generate_customer(team, pool.next_seq)
-        pool.next_seq += 1
+        customer = _generate_customer(next(customer_seq))
         pool.customers.append(customer)
-        return customer["customer_id"], customer["customer_name"], "new"
+        return customer["customer_id"], customer["customer_name"]
 
     customer = random.choice(pool.customers)
-    return customer["customer_id"], customer["customer_name"], "existing"
+    return customer["customer_id"], customer["customer_name"]
 
 
 def _generate_monthly_sale_count(team: Team, profile: Profile) -> int:
@@ -495,9 +496,17 @@ def _generate_monthly_amounts(
     return amounts
 
 
-def _generate_sales(pools: dict[Team, CustomerPool]) -> list[dict]:
-    """Generate every sale document for the whole seeded period."""
+def _generate_sales(
+    pools: dict[Team, CustomerPool], customer_seq: itertools.count
+) -> tuple[list[dict], dict[str, str], dict[str, datetime]]:
+    """Generate every sale document for the whole seeded period.
+
+    Also returns the customer names and each customer's earliest sale date,
+    so the caller can build the matching `customers` collection documents.
+    """
     sales: list[dict] = []
+    customer_names: dict[str, str] = {}
+    customer_first_sale: dict[str, datetime] = {}
     sale_counter = 1
     invoice_counter = 1
 
@@ -522,8 +531,8 @@ def _generate_sales(pools: dict[Team, CustomerPool]) -> list[dict]:
             amounts = _generate_monthly_amounts(team, profile, seasonality, sale_count)
 
             for amount in amounts:
-                customer_id, customer_name, customer_status = _pick_customer(pool, team)
-                max_day = 24 if (year, month) == (2026, 8) else None
+                customer_id, customer_name = _pick_customer(pool, team, customer_seq)
+                max_day = TODAY.day if (year, month) == (TODAY.year, TODAY.month) else None
 
                 sale_date = _random_datetime_in_month(
                     year,
@@ -532,13 +541,16 @@ def _generate_sales(pools: dict[Team, CustomerPool]) -> list[dict]:
                     max_day=max_day,
                 )
 
+                customer_names[customer_id] = customer_name
+                existing_first_sale = customer_first_sale.get(customer_id)
+                if existing_first_sale is None or sale_date < existing_first_sale:
+                    customer_first_sale[customer_id] = sale_date
+
                 sales.append(
                     {
                         "sale_id": f"SALE-{sale_counter:06d}",
                         "invoice_number": f"INV-{year}{month:02d}-{invoice_counter:05d}",
                         "customer_id": customer_id,
-                        "customer_name": customer_name,
-                        "customer_status": customer_status,
                         "salesperson_id": f"SP-{person['id']}",
                         "team": team,
                         "amount": Decimal128(amount),
@@ -550,7 +562,31 @@ def _generate_sales(pools: dict[Team, CustomerPool]) -> list[dict]:
                 sale_counter += 1
                 invoice_counter += 1
 
-    return sales
+    return sales, customer_names, customer_first_sale
+
+
+def _build_customer_documents(
+    customer_names: dict[str, str], customer_first_sale: dict[str, datetime]
+) -> list[dict]:
+    """Build `customers` collection documents for every customer that made a sale.
+
+    Mirrors the shape produced by `POST /customers`: `status` stays `"new"`
+    forever (the dashboard determines "new this period" by combining it with
+    `first_sale_date` falling inside the queried period).
+    """
+    documents = []
+    for customer_id, first_sale_date in sorted(customer_first_sale.items()):
+        documents.append(
+            {
+                "customer_id": customer_id,
+                "customer_name": customer_names[customer_id],
+                "status": "new",
+                "first_sale_date": first_sale_date,
+                "created_at": first_sale_date,
+                "updated_at": first_sale_date,
+            }
+        )
+    return documents
 
 
 def _print_summary(sales: list[dict]) -> None:
@@ -595,11 +631,17 @@ def _print_summary(sales: list[dict]) -> None:
 async def _clear_collections() -> None:
     await db.salespeople.delete_many({})
     await db.sales.delete_many({})
+    await db.customers.delete_many({})
 
 
 async def _insert_salespeople(documents: list[dict]) -> None:
     if documents:
         await db.salespeople.insert_many(documents)
+
+
+async def _insert_customers(documents: list[dict]) -> None:
+    if documents:
+        await db.customers.insert_many(documents)
 
 
 async def _insert_sales(documents: list[dict]) -> None:
@@ -615,6 +657,8 @@ async def _insert_sales(documents: list[dict]) -> None:
 async def main() -> None:
     random.seed(SEED)
 
+    print(f"Seeding sales from {PERIOD_START} up to today ({TODAY.date()})...")
+
     print("Clearing existing collections...")
     await _clear_collections()
 
@@ -624,14 +668,22 @@ async def main() -> None:
     print(f"Inserted {len(salespeople_documents)} salespeople.")
 
     print("Building customer pools...")
-    pools = _build_initial_customer_pools()
+    customer_seq = itertools.count(1)
+    pools = _build_initial_customer_pools(customer_seq)
     for team in TEAMS:
         print(f"  {team}: {len(pools[team].customers)} initial customers")
 
     print("Generating sales...")
-    sales_documents = _generate_sales(pools)
+    sales_documents, customer_names, customer_first_sale = _generate_sales(
+        pools, customer_seq
+    )
     await _insert_sales(sales_documents)
     print(f"Inserted {len(sales_documents)} sales.")
+
+    print("Building and inserting customers...")
+    customer_documents = _build_customer_documents(customer_names, customer_first_sale)
+    await _insert_customers(customer_documents)
+    print(f"Inserted {len(customer_documents)} customers.")
 
     _print_summary(sales_documents)
 

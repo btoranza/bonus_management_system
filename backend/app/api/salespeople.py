@@ -15,7 +15,7 @@ router = APIRouter(prefix="/salespeople", tags=["salespeople"])
 @router.get("/", response_model=PaginatedSalespeopleResponse)
 async def list_salespeople(
     page: int = Query(1, ge=1),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(20, ge=1, le=1000),
     search: str | None = None,
     team: Team | None = None,
     sort: str | None = None,

@@ -1,6 +1,11 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
-import { getCustomers } from '@/services/customers.service'
+import { createCustomer, getCustomers } from '@/services/customers.service'
 import type { CustomersParams } from '@/types/customer.types'
 
 export const useCustomers = ({
@@ -17,5 +22,16 @@ export const useCustomers = ({
         search,
       }),
     placeholderData: keepPreviousData,
+  })
+}
+
+export const useCreateCustomer = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
+    },
   })
 }

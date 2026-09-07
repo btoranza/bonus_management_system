@@ -3,6 +3,10 @@ export interface Customer {
   customer_name: string
 }
 
+export interface CustomerCreate {
+  customer_name: string
+}
+
 export interface PaginatedCustomersResponse {
   items: Customer[]
   total: number

@@ -1,6 +1,8 @@
 import api from '@/services/api'
 
 import type {
+  Customer,
+  CustomerCreate,
   CustomersParams,
   PaginatedCustomersResponse,
 } from '@/types/customer.types'
@@ -23,6 +25,14 @@ export const getCustomers = async ({
   const { data } = await api.get<PaginatedCustomersResponse>('/customers', {
     params,
   })
+
+  return data
+}
+
+export const createCustomer = async (
+  customer: CustomerCreate,
+): Promise<Customer> => {
+  const { data } = await api.post<Customer>('/customers', customer)
 
   return data
 }
