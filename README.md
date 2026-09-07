@@ -453,28 +453,32 @@ Implementation highlights include:
 
 ## Roadmap
 
-| Area | Feature | Short | Mid | Long |
-|------|---------|:-----:|:---:|:----:|
-| **Sales** | Create, edit and delete sales | ✅ | | |
-| | Bulk sales import | ✅ | | |
-| | CSV import/export | ✅ | | |
-| **Salespeople** | Create and edit salespeople | ✅ | | |
-| | Activate / deactivate salespeople | ✅ | | |
-| **Bonuses** | Editable bonus rules | ✅ | | |
-| | Bonus approval workflow | ✅ | | |
-| | Bonus history | | ✅ | |
-| **Users** | User authentication | | ✅ | |
-| | Role-based access control | | ✅ | |
-| **Workspaces** | Finance workspace | | ✅ | |
-| | Sales Manager workspace | | ✅ | |
-| | Sales Representative workspace | | ✅ | |
-| **Analytics** | Team performance management | | ✅ | |
-| | Personal dashboards | | ✅ | |
-| **Platform** | Automated tests | | | ✅ |
-| | Docker support | | | ✅ |
-| | CI/CD pipeline | | | ✅ |
-| | Monitoring & logging | | | ✅ |
-| | Audit logs | | | ✅ |
-| | Application Settings | | ✅ | |
+| Area | Feature | Status | Short | Mid | Long |
+|------|---------|--------|:-----:|:---:|:----:|
+| **Sales** | Create sales | Done | ✅ | | |
+| | Edit and delete sales | In Progress | ✅ | | |
+| | Bulk sales import | To Do | ✅ | | |
+| | CSV import/export | To Do | ✅ | | |
+| **Salespeople** | Create and edit salespeople | To Do | ✅ | | |
+| | Activate / deactivate salespeople | To Do | ✅ | | |
+| **Bonuses** | Editable bonus rules | To Do | ✅ | | |
+| | Bonus approval workflow | To Do | ✅ | | |
+| | Bonus history | To Do | | ✅ | |
+| **Users** | User authentication | To Do | | ✅ | |
+| | Role-based access control | To Do | | ✅ | |
+| **Customers** | Create customer | Done | | ✅ | |
+| | New customers module | In Progress | | ✅ | |
+| | Edit and delete customers | In Progress | | ✅ | |
+| **Workspaces** | Finance workspace | Done | | ✅ | |
+| | Sales Manager workspace | To Do | | ✅ | |
+| | Sales Representative workspace | To Do | | ✅ | |
+| **Analytics** | Team performance management | To Do | | ✅ | |
+| | Personal dashboards | To Do | | ✅ | |
+| **Platform** | Automated tests | To Do | | | ✅ |
+| | Docker support | To Do | | | ✅ |
+| | CI/CD pipeline | To Do | | | ✅ |
+| | Monitoring & logging | To Do | | | ✅ |
+| | Audit logs | To Do | | | ✅ |
+| | Application Settings | To Do | | ✅ | |
 
 ---
