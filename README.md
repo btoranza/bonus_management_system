@@ -178,39 +178,77 @@ style Backend fill:#FFFFFF,stroke:#2B2D42,stroke-width:2px;
 ---
 
 ```mermaid
-flowchart LR
+sequenceDiagram
+    actor User
+    participant Dialog as CreateSaleDialog
+    participant Form as SaleForm
+    participant Customer as CustomerCombobox
+    participant API as FastAPI
+    participant DB as MongoDB
 
-    A["Open New Sale"] --> B["SaleForm"]
+    rect rgb(248, 255, 255)
+        User->>Dialog: Open "New Sale"
+        Dialog->>Form: Display SaleForm
 
-    B --> C["CustomerCombobox"]
-    C --> D{"Customer exists?"}
+        User->>Customer: Search for customer
+        Customer->>API: GET /customers?search=...
+    end
 
-    D -->|Yes| E["Select customer"]
-    E --> F["Complete form"]
+    rect rgb(250, 248, 255)
+        API->>DB: Search customers
+        DB-->>API: Matching customers
+        API-->>Customer: Customer list
+    end
 
-    D -->|No| G["+ New customer"]
-    G --> H["NewCustomerForm"]
-    H --> I["POST /customers"]
-    I --> J["CUST-NNNNNN created"]
-    J --> K["Return to SaleForm"]
-    K --> L["Auto-select customer"]
-    L --> F
+    alt Customer exists
+        rect rgb(248, 255, 255)
+            User->>Customer: Select customer
+            Customer-->>Form: Set selected customer
+        end
 
-    F --> M["Submit sale"]
-    M --> N["POST /sales"]
-    N --> O["Create sale_id"]
-    O --> P["Update first_sale_date"]
-    P --> Q["Success toast"]
-    Q --> R["Close & reset dialog"]
-    R --> S["Invalidate queries"]
+    else Customer does not exist
+        rect rgb(248, 255, 255)
+            User->>Customer: Click "+ New customer"
+            Form->>Dialog: Request new customer view
+            Dialog->>Dialog: Show NewCustomerForm
 
-    classDef frontend fill:#F8FFFF,stroke:#2EC4B6,stroke-width:2px,color:#2B2D42;
-    classDef decision fill:#FAF8FF,stroke:#A78BFA,stroke-width:2px,color:#2B2D42;
-    classDef backend fill:#F8FFF9,stroke:#37C871,stroke-width:2px,color:#2B2D42;
+            User->>Dialog: Enter customer name
+            Dialog->>Dialog: Validate with Zod
+            User->>Dialog: Submit
+        end
 
-    class A,B,C,E,F,G,H,K,L,M,Q,R,S frontend;
-    class D decision;
-    class I,J,N,O,P backend;
+        rect rgb(250, 248, 255)
+            Dialog->>API: POST /customers
+            API->>DB: Create customer
+            DB-->>API: Customer with generated ID
+            API-->>Dialog: Customer
+        end
+
+        rect rgb(248, 255, 255)
+            Dialog->>Dialog: Reset form & store selected customer
+            Dialog->>Form: Return to SaleForm<br/>with selectedCustomer prop
+            Form->>Customer: Pass selectedCustomer as value
+        end
+    end
+
+    rect rgb(248, 255, 255)
+        User->>Form: Complete remaining fields
+        User->>Form: Submit sale
+        Form->>API: POST /sales
+    end
+
+    rect rgb(250, 248, 255)
+        API->>DB: Create sale
+        DB-->>API: Sale created
+        API->>DB: Update first_sale_date using $min
+        API-->>Form: SaleResponse
+    end
+
+    rect rgb(248, 255, 255)
+        Form->>Dialog: Show success toast
+        Dialog->>Dialog: Close & reset
+        Dialog->>API: Invalidate sales, dashboard,<br/>bonuses & customers queries
+    end
 ```
 
 ### **New Customer Creation**
