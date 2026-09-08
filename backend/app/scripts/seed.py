@@ -406,7 +406,9 @@ def _generate_customer(customer_seq: int) -> dict:
     }
 
 
-def _build_initial_customer_pools(customer_seq: itertools.count) -> dict[Team, CustomerPool]:
+def _build_initial_customer_pools(
+    customer_seq: itertools.count,
+) -> dict[Team, CustomerPool]:
     """Pre-populate each team's customer pool with a random set of customers."""
     pools: dict[Team, CustomerPool] = {}
     for team in TEAMS:
@@ -507,7 +509,6 @@ def _generate_sales(
     sales: list[dict] = []
     customer_names: dict[str, str] = {}
     customer_first_sale: dict[str, datetime] = {}
-    sale_counter = 1
     invoice_counter = 1
 
     for year, month in _iter_months(PERIOD_START, PERIOD_END):
@@ -532,7 +533,9 @@ def _generate_sales(
 
             for amount in amounts:
                 customer_id, customer_name = _pick_customer(pool, team, customer_seq)
-                max_day = TODAY.day if (year, month) == (TODAY.year, TODAY.month) else None
+                max_day = (
+                    TODAY.day if (year, month) == (TODAY.year, TODAY.month) else None
+                )
 
                 sale_date = _random_datetime_in_month(
                     year,
@@ -546,12 +549,16 @@ def _generate_sales(
                 if existing_first_sale is None or sale_date < existing_first_sale:
                     customer_first_sale[customer_id] = sale_date
 
+                salesperson_id = f"SP-{person['id']}"
+                invoice_number = f"INV-{year}{month:02d}-{invoice_counter:05d}"
+
                 sales.append(
                     {
-                        "sale_id": f"SALE-{sale_counter:06d}",
-                        "invoice_number": f"INV-{year}{month:02d}-{invoice_counter:05d}",
+                        # Matches the `{salesperson_id}-{invoice_number}` id POST /sales generates.
+                        "sale_id": f"{salesperson_id}-{invoice_number}",
+                        "invoice_number": invoice_number,
                         "customer_id": customer_id,
-                        "salesperson_id": f"SP-{person['id']}",
+                        "salesperson_id": salesperson_id,
                         "team": team,
                         "amount": Decimal128(amount),
                         "date": sale_date,
@@ -559,7 +566,6 @@ def _generate_sales(
                         "updated_at": sale_date,
                     }
                 )
-                sale_counter += 1
                 invoice_counter += 1
 
     return sales, customer_names, customer_first_sale
