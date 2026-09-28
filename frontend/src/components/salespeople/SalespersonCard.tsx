@@ -1,6 +1,8 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import TeamBadge from '@/components/ui/team-badge'
 import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
+import { getTeamColor } from '@/lib/team-colors'
 import type { Salesperson } from '@/types/salesperson.types'
 
 interface SalespersonCardProps {
@@ -11,11 +13,18 @@ const getInitials = (firstName: string, lastName: string) =>
   `${firstName[0] ?? ''}${lastName[0] ?? ''}`
 
 const SalespersonCard = ({ salesperson }: SalespersonCardProps) => {
+  const teamColor = getTeamColor(salesperson.team)
+
   return (
-    <div className="rounded-2xl border bg-card p-4">
+    <div
+      className={cn(
+        'rounded-2xl border border-l-4 bg-card p-4',
+        teamColor.border,
+      )}
+    >
       <div className="flex items-center gap-3">
         <Avatar>
-          <AvatarFallback className="bg-muted text-muted-foreground">
+          <AvatarFallback className={teamColor.badge}>
             {getInitials(salesperson.first_name, salesperson.last_name)}
           </AvatarFallback>
         </Avatar>
@@ -41,8 +50,8 @@ const SalespersonCard = ({ salesperson }: SalespersonCardProps) => {
         </span>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-3 text-sm text-muted-foreground">
-        <span>{salesperson.team}</span>
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 text-sm text-muted-foreground">
+        <TeamBadge team={salesperson.team} />
         <span aria-hidden="true">·</span>
         <span className="tabular-nums">{salesperson.salesperson_id}</span>
         <span aria-hidden="true">·</span>

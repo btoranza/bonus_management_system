@@ -1,19 +1,29 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group'
 import { useToastManager } from '@/components/ui/toast'
 import { useCreateSale } from '@/hooks/use-sales'
 import CustomerCombobox, { type CustomerOption } from './CustomerCombobox'
 import SalespersonSelect from './SalespersonSelect'
 
+const getToday = () => new Date().toISOString().slice(0, 10)
+
 const saleSchema = z.object({
   salesperson_id: z.string().min(1, 'Salesperson is required'),
-  invoice_number: z.string().min(1, 'Invoice number is required'),
+  invoice_number: z
+    .string()
+    .regex(/^INV-\d{6}-\d+$/, 'Invoice number is required'),
   customer_id: z.string().min(1, 'Customer is required'),
   amount: z.number().positive('Amount must be greater than 0'),
   date: z.string().min(1, 'Date is required'),
@@ -39,13 +49,30 @@ const SaleForm = ({
     handleSubmit,
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<SaleFormValues>({
     resolver: zodResolver(saleSchema),
+    defaultValues: { date: getToday() },
   })
 
   const { mutate, isPending, error } = useCreateSale()
   const { add: addToast } = useToastManager()
+
+  const [invoiceSuffix, setInvoiceSuffix] = useState('')
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form's watch() isn't compiler-memoizable
+  const date = watch('date')
+  const invoicePeriod = date ? date.slice(0, 4) + date.slice(5, 7) : ''
+  const invoicePrefix = `INV-${invoicePeriod}-`
+
+  // Keep the derived invoice number in sync with the sale date and the
+  // hand-typed suffix, since the year/month segment isn't user-editable.
+  useEffect(() => {
+    setValue('invoice_number', `${invoicePrefix}${invoiceSuffix}`, {
+      shouldValidate: Boolean(invoiceSuffix),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoicePrefix, invoiceSuffix])
 
   // Keep the form's customer_id in sync when the selection is set externally (e.g. after creating a customer)
   useEffect(() => {
@@ -132,11 +159,21 @@ const SaleForm = ({
 
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">Invoice number</label>
-          <Input
-            className="h-10"
-            {...register('invoice_number')}
-            placeholder="INV-202608-01578"
-          />
+          <InputGroup className="h-10">
+            <InputGroupAddon>
+              <InputGroupText className="font-medium text-foreground">
+                {invoicePrefix}
+              </InputGroupText>
+            </InputGroupAddon>
+            <InputGroupInput
+              value={invoiceSuffix}
+              onChange={(e) =>
+                setInvoiceSuffix(e.target.value.replace(/\D/g, ''))
+              }
+              placeholder="01578"
+              inputMode="numeric"
+            />
+          </InputGroup>
           {errors.invoice_number && (
             <p className="text-sm text-destructive">
               {errors.invoice_number.message}

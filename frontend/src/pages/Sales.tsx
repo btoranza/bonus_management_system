@@ -82,7 +82,7 @@ const Sales = () => {
         )}
       </div>
 
-      <footer className="mt-auto pt-5">
+      <footer className="mt-auto pt-5 pb-3 sm:pb-0">
         <div className="flex justify-end">
           <CreateSaleDialog />
         </div>

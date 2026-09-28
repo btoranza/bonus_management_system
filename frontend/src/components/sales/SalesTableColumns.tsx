@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 
 import SortableHeader from '@/components/ui/sortable-header'
+import TeamBadge from '@/components/ui/team-badge'
 import { formatCurrency } from '@/lib/currency'
 import { formatDate } from '@/lib/date'
 import type { Sale, SalesSort, SortOrder } from '@/types/sale.types'
@@ -44,6 +45,7 @@ export const getSalesTableColumns = ({
   {
     accessorKey: 'team',
     header: 'Team',
+    cell: ({ row }) => <TeamBadge team={row.original.team} />,
   },
   {
     accessorKey: 'amount',

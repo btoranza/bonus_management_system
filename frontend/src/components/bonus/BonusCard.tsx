@@ -1,4 +1,7 @@
+import TeamBadge from '@/components/ui/team-badge'
 import { formatCurrency } from '@/lib/currency'
+import { cn } from '@/lib/utils'
+import { getTeamColor } from '@/lib/team-colors'
 import type { Bonus } from '@/types/bonus.types'
 
 interface BonusCardProps {
@@ -6,12 +9,19 @@ interface BonusCardProps {
 }
 
 const BonusCard = ({ bonus }: BonusCardProps) => {
+  const teamColor = getTeamColor(bonus.team)
+
   return (
-    <div className="rounded-2xl border bg-card p-4">
+    <div
+      className={cn(
+        'rounded-2xl border border-l-4 bg-card p-4',
+        teamColor.border,
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-medium">{bonus.salesperson_name}</p>
-          <p className="text-sm text-muted-foreground">{bonus.team}</p>
+          <TeamBadge team={bonus.team} className="mt-1" />
         </div>
 
         <div className="shrink-0 text-right">
