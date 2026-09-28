@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import DataTable from '@/components/ui/data-table'
 import { getBonusesTableColumns } from '@/components/bonus/BonusTableColumns'
+import BonusCard from '@/components/bonus/BonusCard'
 import TableToolbar from '@/components/ui/table-toolbar'
 import Spinner from '@/components/ui/spinner'
 import useDebounce from '@/hooks/use-debounce'
@@ -30,7 +31,7 @@ const Bonuses = () => {
     setPage(1)
   }, [period.year, period.month, debouncedSearch, team])
 
-  const { data, isPending, isError } = useBonuses({
+  const { data, isPending, isFetching, isError } = useBonuses({
     year: period.year,
     month: period.month,
     page,
@@ -59,7 +60,7 @@ const Bonuses = () => {
   }
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex h-full flex-col p-3 sm:p-5">
       <div className="space-y-5">
         <TableToolbar
           search={search}
@@ -82,6 +83,8 @@ const Bonuses = () => {
             page={page}
             totalPages={data?.total_pages ?? 1}
             onPageChange={setPage}
+            mobileCard={(bonus) => <BonusCard bonus={bonus} />}
+            isFetching={isFetching}
           />
         )}
       </div>

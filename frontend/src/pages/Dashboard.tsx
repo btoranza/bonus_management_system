@@ -34,7 +34,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-5 p-5">
+    <div className="space-y-4 p-3 sm:space-y-5 sm:p-5">
       <KpiCards
         totalSales={data.total_sales}
         totalSalesChangePct={data.total_sales_change_pct}

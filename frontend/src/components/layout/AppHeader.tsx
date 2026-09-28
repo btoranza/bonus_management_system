@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, PanelLeft } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu, PanelLeft } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -38,7 +38,7 @@ const periodOptions = Array.from({ length: 12 }, (_, i) => {
 const AppHeader = () => {
   const { period, setPeriod } = usePeriod()
   const { pathname } = useLocation()
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isMobile } = useSidebar()
 
   const title = pageTitles[pathname] ?? ''
 
@@ -54,12 +54,14 @@ const AppHeader = () => {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b pl-3 pr-6">
+    <header className="flex h-auto min-h-16 flex-wrap items-center justify-between gap-y-2 border-b px-3 py-2 sm:h-16 sm:flex-nowrap sm:py-0 sm:pl-3 sm:pr-6">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon-sm" onClick={toggleSidebar}>
-          <PanelLeft className="size-4" />
+          {isMobile ? <Menu className="size-4" /> : <PanelLeft className="size-4" />}
         </Button>
-        <h1 className="font-heading text-2xl font-semibold">{title}</h1>
+        <h1 className="font-heading text-lg font-semibold sm:text-2xl">
+          {title}
+        </h1>
       </div>
 
       <div className="flex items-center gap-1">

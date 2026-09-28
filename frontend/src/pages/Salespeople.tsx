@@ -7,6 +7,7 @@ import TableToolbar from '@/components/ui/table-toolbar'
 import useDebounce from '@/hooks/use-debounce'
 import { useSalespeople } from '@/hooks/use-salespeople'
 import { getSalespeopleTableColumns } from '@/components/salespeople/SalespeopleTableColumns'
+import SalespersonCard from '@/components/salespeople/SalespersonCard'
 import Spinner from '@/components/ui/spinner'
 import type { SalespeopleSort, SortOrder } from '@/types/salesperson.types'
 
@@ -24,7 +25,7 @@ const Salespeople = () => {
     setPage(1)
   }, [debouncedSearch, team])
 
-  const { data, isPending, isError } = useSalespeople({
+  const { data, isPending, isFetching, isError } = useSalespeople({
     page,
     limit: PAGE_SIZE,
     search: debouncedSearch,
@@ -38,7 +39,7 @@ const Salespeople = () => {
   }
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex h-full flex-col p-3 sm:p-5">
       <div className="space-y-5">
         <TableToolbar
           search={search}
@@ -69,6 +70,10 @@ const Salespeople = () => {
             page={page}
             totalPages={data?.total_pages ?? 1}
             onPageChange={setPage}
+            mobileCard={(salesperson) => (
+              <SalespersonCard salesperson={salesperson} />
+            )}
+            isFetching={isFetching}
           />
         )}
       </div>

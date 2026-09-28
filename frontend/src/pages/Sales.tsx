@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { PAGE_SIZE } from '@/constants/page'
 import { getSalesTableColumns } from '@/components/sales/SalesTableColumns'
+import SaleCard from '@/components/sales/SaleCard'
 import DataTable from '@/components/ui/data-table'
 import useDebounce from '@/hooks/use-debounce'
 import { TEAM_OPTIONS } from '@/constants/teams'
@@ -28,7 +29,7 @@ const Sales = () => {
     setPage(1)
   }, [period.year, period.month, debouncedSearch, team])
 
-  const { data, isPending, isError } = useSales({
+  const { data, isPending, isFetching, isError } = useSales({
     year: period.year,
     month: period.month,
     page,
@@ -44,7 +45,7 @@ const Sales = () => {
   }
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex h-full flex-col p-3 sm:p-5">
       <div className="space-y-5">
         <TableToolbar
           search={search}
@@ -75,6 +76,8 @@ const Sales = () => {
             page={page}
             totalPages={data?.total_pages ?? 1}
             onPageChange={setPage}
+            mobileCard={(sale) => <SaleCard sale={sale} />}
+            isFetching={isFetching}
           />
         )}
       </div>
