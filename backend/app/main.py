@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pymongo.errors import OperationFailure
 
 from app.api.bonus import router as bonus_router
 from app.api.customers import router as customers_router
@@ -17,10 +18,17 @@ async def lifespan(app: FastAPI):
 
     await db.command("ping")
 
-    await db.sales.create_index([("date", 1)])
-    await db.sales.create_index([("salesperson_id", 1), ("date", -1)])
-    await db.customers.create_index("customer_id")
-    await db.salespeople.create_index("salesperson_id")
+    # Best-effort: an index that conflicts with an existing one (e.g. a unique
+    # index created elsewhere) must not prevent the API from starting.
+    for collection, keys in (
+        (db.sales, [("date", 1)]),
+        (db.sales, [("salesperson_id", 1), ("date", -1)]),
+        (db.customers, [("customer_id", 1)]),
+    ):
+        try:
+            await collection.create_index(keys)
+        except OperationFailure as exc:
+            print(f"Skipping index {keys}: {exc}")
 
     print("Connected!")
 
