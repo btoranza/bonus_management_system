@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -112,6 +113,28 @@ async def _aggregate_sales(year: int, month: int) -> list[dict]:
     return results
 
 
+async def _monthly_totals(year: int, month: int, months: int) -> dict[tuple[int, int], Decimal]:
+    """Total sales per month for the `months` months ending at (year, month), in one query."""
+    start_year, start_month = _shift_month(year, month, -(months - 1))
+    start_date, _ = month_bounds(start_year, start_month)
+    _, end_date = month_bounds(year, month)
+
+    pipeline = [
+        {"$match": {"date": {"$gte": start_date, "$lt": end_date}}},
+        {
+            "$group": {
+                "_id": {"y": {"$year": "$date"}, "m": {"$month": "$date"}},
+                "total_sales": {"$sum": "$amount"},
+            }
+        },
+    ]
+    rows = await db.sales.aggregate(pipeline).to_list(None)
+    return {
+        (row["_id"]["y"], row["_id"]["m"]): row["total_sales"].to_decimal()
+        for row in rows
+    }
+
+
 def _enrich_with_bonus(results: list[dict], salespeople_map: dict) -> None:
     for result in results:
         if result["salesperson_id"] not in salespeople_map:
@@ -128,18 +151,22 @@ def _enrich_with_bonus(results: list[dict], salespeople_map: dict) -> None:
 
 async def get_dashboard_summary(year: int, month: int) -> DashboardResponse:
     _, period_end = month_bounds(year, month)
-    salespeople = await db.salespeople.find(
-        {"active": True, "hire_date": {"$lt": period_end}}
-    ).to_list(None)
+    prev_year, prev_month = _shift_month(year, month, -1)
+
+    # Independent queries: run them concurrently instead of one after another.
+    salespeople, results, prev_results, monthly_totals = await asyncio.gather(
+        db.salespeople.find(
+            {"active": True, "hire_date": {"$lt": period_end}}
+        ).to_list(None),
+        _aggregate_sales(year, month),
+        _aggregate_sales(prev_year, prev_month),
+        _monthly_totals(year, month, TREND_MONTHS),
+    )
     salespeople_map = {
         salesperson["salesperson_id"]: salesperson for salesperson in salespeople
     }
 
-    results = await _aggregate_sales(year, month)
     _enrich_with_bonus(results, salespeople_map)
-
-    prev_year, prev_month = _shift_month(year, month, -1)
-    prev_results = await _aggregate_sales(prev_year, prev_month)
     _enrich_with_bonus(prev_results, salespeople_map)
 
     total_sales = sum((item["total_sales"] for item in results), Decimal(0))
@@ -254,13 +281,7 @@ async def get_dashboard_summary(year: int, month: int) -> DashboardResponse:
     sales_trend = []
     for offset in range(TREND_MONTHS - 1, -1, -1):
         trend_year, trend_month = _shift_month(year, month, -offset)
-        if offset == 0:
-            trend_results = results
-        else:
-            trend_results = await _aggregate_sales(trend_year, trend_month)
-        trend_total_sales = sum(
-            (item["total_sales"] for item in trend_results), Decimal(0)
-        )
+        trend_total_sales = monthly_totals.get((trend_year, trend_month), Decimal(0))
         label = datetime(trend_year, trend_month, 1, tzinfo=timezone.utc).strftime("%b")
         sales_trend.append(TrendPoint(period=label, total_sales=trend_total_sales))
 

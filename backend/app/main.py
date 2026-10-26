@@ -17,6 +17,11 @@ async def lifespan(app: FastAPI):
 
     await db.command("ping")
 
+    await db.sales.create_index([("date", 1)])
+    await db.sales.create_index([("salesperson_id", 1), ("date", -1)])
+    await db.customers.create_index("customer_id")
+    await db.salespeople.create_index("salesperson_id")
+
     print("Connected!")
 
     yield
